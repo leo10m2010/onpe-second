@@ -60,3 +60,41 @@ El frontend llama a:
 ```
 
 El backend llama internamente a ONPE.
+
+## Deploy en Vercel
+
+El proyecto incluye `vercel.json` para servir el frontend y las rutas serverless de `/api`.
+
+Deploy manual:
+
+```bash
+npm run deploy
+```
+
+Deploy a produccion:
+
+```bash
+npm run deploy:prod
+```
+
+## Auto-deploy en Vercel
+
+Opcion recomendada: conecta este repositorio en Vercel. Cada push a `main` se desplegara automaticamente.
+
+Opcion con GitHub Actions: el workflow `.github/workflows/vercel-production.yml` despliega a produccion cuando haces push a `main` o cuando lo ejecutas manualmente.
+
+Configura estos secrets en GitHub:
+
+```txt
+VERCEL_TOKEN
+VERCEL_ORG_ID
+VERCEL_PROJECT_ID
+```
+
+Puedes obtener `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID` ejecutando una vez:
+
+```bash
+npx vercel link
+```
+
+Luego revisa `.vercel/project.json`. No subas la carpeta `.vercel` al repositorio.

@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "deploy": "npx --yes vercel@latest",
+    "deploy:prod": "npx --yes vercel@latest --prod",
     "discover:onpe": "node scripts/discover-onpe.js"
   },
   "dependencies": {
