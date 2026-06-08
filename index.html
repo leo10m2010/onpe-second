@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elecciones 2026 | Segunda Vuelta</title>
+  <meta name="description" content="Dashboard ciudadano de resultados ONPE Segunda Vuelta 2026 con actualización desde APIs públicas." />
+  <link rel="preconnect" href="https://resultadosegundavuelta.onpe.gob.pe" />
+  <link rel="preconnect" href="https://tiles.openfreemap.org" />
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,850&family=IBM+Plex+Mono:wght@600;700&family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js" defer></script>
+  <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js" defer></script>
+  <script src="app.js?v=20260608-4" defer></script>
+</head>
+<body>
+  <div class="page-bg"></div>
+  <header class="site-header">
+    <div class="brand">
+      <div class="brand-mark">PE</div>
+      <div>
+        <p class="eyebrow">Conteo ONPE</p>
+        <h1>Segunda Vuelta Presidencial 2026</h1>
+      </div>
+    </div>
+    <nav class="top-nav" aria-label="Navegación principal">
+      <a href="#resumen">Resumen</a>
+      <a href="#duelo">Duelo</a>
+      <a href="#mapa">Mapa</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="race-hero" id="resumen">
+      <p class="process-line" id="processInfo">Consultando proceso electoral activo...</p>
+      <h2>2da Vuelta Presidencial al <strong id="heroCounted">--</strong></h2>
+      <span class="build-code">ONPE oficial vía proxy local</span>
+    </section>
+
+    <section class="duel-board" id="duelo" aria-label="Comparativo presidencial">
+      <article class="candidate-side candidate-left">
+        <div class="candidate-avatar" id="leftAvatar">--</div>
+        <div>
+          <strong id="leftPct">--</strong>
+          <h3 id="leftName">Cargando...</h3>
+          <p id="leftOrg">--</p>
+        </div>
+      </article>
+
+      <article class="breach-card">
+        <span class="live-dot">Live</span>
+        <small>Brecha</small>
+        <strong id="voteGap">--</strong>
+        <em>votos</em>
+      </article>
+
+      <article class="candidate-side candidate-right">
+        <div>
+          <strong id="rightPct">--</strong>
+          <h3 id="rightName">Cargando...</h3>
+          <p id="rightOrg">--</p>
+        </div>
+        <div class="candidate-avatar" id="rightAvatar">--</div>
+      </article>
+
+      <div class="split-track" aria-label="Barra comparativa de votos">
+        <span class="left-votes" id="leftVotes">-- votos</span>
+        <div class="split-left" id="splitLeft"></div>
+        <div class="split-right" id="splitRight"></div>
+        <span class="right-votes" id="rightVotes">-- votos</span>
+      </div>
+    </section>
+
+    <section class="count-strip">
+      <div class="count-pill">
+        <span>Conteo ONPE</span>
+        <div class="mini-gradient"><i id="miniNeedle"></i></div>
+        <strong id="countedInline">--</strong>
+        <small id="actasInline">-- de -- actas</small>
+      </div>
+      <button class="primary-btn" id="refreshBtn">Refrescar resultados</button>
+    </section>
+
+    <div class="update-line">
+      <span id="apiDot" class="status-dot"></span>
+      <span id="apiStatus">Conectando con ONPE...</span>
+      <span id="lastUpdate">Esperando carga inicial...</span>
+    </div>
+
+    <section class="kpi-grid" aria-label="Indicadores principales">
+      <article class="kpi-card">
+        <span>Actas procesadas</span>
+        <strong id="processedActs">--</strong>
+        <div class="meter"><span id="processedBar"></span></div>
+      </article>
+      <article class="kpi-card">
+        <span>Actas contabilizadas</span>
+        <strong id="countedActs">--</strong>
+        <div class="meter"><span id="countedBar"></span></div>
+      </article>
+      <article class="kpi-card">
+        <span>Participación</span>
+        <strong id="participation">--</strong>
+        <div class="meter"><span id="participationBar"></span></div>
+      </article>
+      <article class="kpi-card">
+        <span>Total votos válidos</span>
+        <strong id="validVotes">--</strong>
+        <small id="totalVotesNote">Según disponibilidad del endpoint</small>
+      </article>
+    </section>
+
+    <section class="results-grid">
+      <article class="panel candidate-panel" id="candidatos">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Total nacional</p>
+            <h3>Tarjeta país</h3>
+          </div>
+          <span class="tag">Organización política</span>
+        </div>
+        <div id="candidateList" class="candidate-list"></div>
+      </article>
+
+      <article class="panel chart-panel national-card">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Participación ciudadana</p>
+            <h3>Perú</h3>
+          </div>
+          <span class="tag" id="nationalTag">al --</span>
+        </div>
+        <canvas id="voteChart" height="190" aria-label="Gráfico de participación"></canvas>
+        <div class="participation-list">
+          <p><span>Inscritos</span><strong id="registeredCount">--</strong></p>
+          <p><span>Válidos</span><strong id="validCount">--</strong></p>
+          <p><span>Blancos y nulos</span><strong id="blankNullCount">--</strong></p>
+          <p><span>No votaron</span><strong id="noVoteCount">--</strong></p>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel projection-panel" id="proyeccion">
+      <div class="projection-head">
+        <div>
+          <p class="eyebrow">Lectura rápida</p>
+          <h3>Evolución y proyección de ganador</h3>
+        </div>
+        <div class="projection-badges">
+          <span><i class="keiko-dot"></i>Keiko Fujimori</span>
+          <span><i class="roberto-dot"></i>Roberto Sánchez</span>
+        </div>
+      </div>
+      <div id="projectionSketch" class="projection-sketch" role="img" aria-label="Dibujo de proyección visual de resultados"></div>
+      <p class="projection-note" id="projectionNote">Estimación visual no oficial. Se actualiza con los porcentajes nacionales disponibles.</p>
+    </section>
+
+    <section class="content-grid map-layout" id="mapa">
+      <article class="panel map-panel">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Territorio</p>
+            <h3>Mapa de calor por ubicación</h3>
+          </div>
+        </div>
+        <div id="mapCanvas" class="map-canvas" role="img" aria-label="Mapa interactivo de resultados por regiones"></div>
+      </article>
+
+      <article class="panel table-panel">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Territorio</p>
+            <h3>Avance por departamento</h3>
+          </div>
+        </div>
+        <div class="search-box">
+            <input id="regionSearch" type="search" placeholder="Buscar departamento" />
+        </div>
+        <div id="locationRows" class="department-list"></div>
+      </article>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Desarrollado como dashboard web estático con HTML, CSS y JavaScript.</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "onpe-elecciones-2026-dashboard",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Dashboard de resultados ONPE con proxy para evitar bloqueo CORS.",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "discover:onpe": "node scripts/discover-onpe.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
