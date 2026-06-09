@@ -1,6 +1,8 @@
 const { endpoints } = require('./onpe-map');
 
 const ALLOWED_HOSTS = new Set(['resultadosegundavuelta.onpe.gob.pe']);
+const RONB_BASE = 'https://api.ronbstudio.com';
+const RONB_RESOURCES = new Set(['snapshot', 'proyeccion', 'timeline', 'exterior-paises']);
 
 function resolveTarget(query = {}) {
   const key = query.key;
@@ -80,7 +82,7 @@ async function fetchOnpe(query = {}) {
 
   if (isProbablyHtml(contentType, text)) {
     return {
-      status: 502,
+      status: 200,
       body: {
         ok: false,
         type: 'UPSTREAM_HTML',
@@ -100,7 +102,7 @@ async function fetchOnpe(query = {}) {
     json = JSON.parse(text);
   } catch (error) {
     return {
-      status: 502,
+      status: 200,
       body: {
         ok: false,
         type: 'UPSTREAM_NOT_JSON',
@@ -121,4 +123,69 @@ async function fetchOnpe(query = {}) {
   };
 }
 
-module.exports = { endpoints, fetchOnpe };
+async function fetchRonb(resource, query = {}) {
+  if (!RONB_RESOURCES.has(resource)) {
+    return {
+      status: 404,
+      body: { ok: false, error: 'Recurso RonBStudio no permitido' }
+    };
+  }
+
+  const target = new URL(`/api/${resource}`, RONB_BASE);
+  if (resource === 'timeline' && query.limit) target.searchParams.set('limit', query.limit);
+
+  const response = await fetch(target.toString(), {
+    redirect: 'follow',
+    headers: {
+      Accept: 'application/json',
+      'Accept-Language': 'es-PE,es;q=0.9,en;q=0.8',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/125 Safari/537.36',
+      Origin: 'https://www.ronbstudio.com',
+      Referer: 'https://www.ronbstudio.com/Portfolio/2026/Elecciones2026/SegundaVuelta/'
+    }
+  });
+
+  const contentType = response.headers.get('content-type') || '';
+  const text = await response.text();
+
+  if (isProbablyHtml(contentType, text)) {
+    return {
+      status: 200,
+      body: {
+        ok: false,
+        type: 'UPSTREAM_HTML',
+        error: 'RonBStudio respondió HTML y no JSON.',
+        target: target.toString(),
+        upstreamStatus: response.status,
+        upstreamContentType: contentType,
+        sample: text.slice(0, 180)
+      }
+    };
+  }
+
+  let json;
+  try {
+    json = JSON.parse(text);
+  } catch (error) {
+    return {
+      status: 200,
+      body: {
+        ok: false,
+        type: 'UPSTREAM_NOT_JSON',
+        error: 'RonBStudio respondió contenido que no es JSON.',
+        target: target.toString(),
+        upstreamStatus: response.status,
+        upstreamContentType: contentType,
+        sample: text.slice(0, 180)
+      }
+    };
+  }
+
+  return {
+    status: response.status,
+    body: json,
+    target: target.toString()
+  };
+}
+
+module.exports = { endpoints, fetchOnpe, fetchRonb };

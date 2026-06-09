@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { fetchOnpe, endpoints } = require('./proxy-core');
+const { fetchOnpe, fetchRonb, endpoints } = require('./proxy-core');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -45,7 +45,24 @@ app.get('/api/debug', async (req, res) => {
   }
 });
 
-app.use(express.static(path.join(__dirname)));
+app.get('/api/ronb/:resource', async (req, res) => {
+  try {
+    const result = await fetchRonb(req.params.resource, req.query);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    if (result.target) res.setHeader('X-Proxy-Target', result.target);
+    return res.status(result.status || 200).json(result.body);
+  } catch (error) {
+    return res.status(500).json({ ok: false, error: error.message || 'Error interno del proxy RonBStudio' });
+  }
+});
+
+app.use(express.static(path.join(__dirname), {
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'no-store');
+  }
+}));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));

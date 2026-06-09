@@ -3,7 +3,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const TARGET = process.argv[2] || 'https://resultados.onpe.gob.pe/EG2026/ResumenGeneral/10/T';
+const TARGET = process.argv[2] || 'https://resultadosegundavuelta.onpe.gob.pe/main/resumen';
 const PORT = Number(process.env.ONPE_CDP_PORT || 9333);
 const WAIT_MS = Number(process.env.ONPE_DISCOVER_WAIT || 120000);
 
@@ -86,10 +86,40 @@ function connectToPage(wsUrl) {
       if (message.method === 'Network.responseReceived') {
         const response = message.params.response;
         remember(response.url, {
+          requestId: message.params.requestId,
           status: response.status,
           mimeType: response.mimeType,
           contentType: response.headers['content-type'] || response.headers['Content-Type'] || ''
         });
+
+        const isUsefulBody = /json|javascript|text|html/i.test(response.mimeType || '')
+          || /json|api|backend|resumen|total|mesa|eleccion/i.test(response.url || '');
+        if (isUsefulBody) {
+          send('Network.getResponseBody', { requestId: message.params.requestId })
+            .then(body => {
+              const text = body.base64Encoded ? Buffer.from(body.body, 'base64').toString('utf8') : body.body;
+              remember(response.url, {
+                bodySample: text.slice(0, 4000),
+                bodyLength: text.length
+              });
+            })
+            .catch(() => {});
+        }
+      }
+
+      if (message.method === 'Page.loadEventFired') {
+        send('Runtime.evaluate', {
+          expression: `({
+            href: location.href,
+            title: document.title,
+            text: document.body ? document.body.innerText.slice(0, 6000) : '',
+            scripts: [...document.scripts].map(s => s.src).filter(Boolean),
+            links: [...document.querySelectorAll('a[href]')].map(a => a.href).slice(0, 100)
+          })`,
+          returnByValue: true
+        }).then(result => {
+          remember(TARGET, { pageSnapshot: result.result?.value });
+        }).catch(() => {});
       }
     };
 

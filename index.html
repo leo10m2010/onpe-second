@@ -11,11 +11,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,850&family=IBM+Plex+Mono:wght@600;700&family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.3.2/css/flag-icons.min.css" />
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=20260609-22" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js" defer></script>
   <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js" defer></script>
-  <script src="app.js?v=20260608-4" defer></script>
+  <script src="app.js?v=20260609-29" defer></script>
 </head>
 <body>
   <div class="page-bg"></div>
@@ -38,7 +39,6 @@
     <section class="race-hero" id="resumen">
       <p class="process-line" id="processInfo">Consultando proceso electoral activo...</p>
       <h2>2da Vuelta Presidencial al <strong id="heroCounted">--</strong></h2>
-      <span class="build-code">ONPE oficial vía proxy local</span>
     </section>
 
     <section class="duel-board" id="duelo" aria-label="Comparativo presidencial">
@@ -76,20 +76,21 @@
     </section>
 
     <section class="count-strip">
+      <p class="refresh-line"><span id="apiDot" class="status-dot ok"></span><span id="apiStatus" class="sr-only">Conectando con ONPE...</span><span id="lastUpdate">Esperando carga inicial...</span></p>
       <div class="count-pill">
-        <span>Conteo ONPE</span>
-        <div class="mini-gradient"><i id="miniNeedle"></i></div>
-        <strong id="countedInline">--</strong>
-        <small id="actasInline">-- de -- actas</small>
+        <div class="count-head">
+          <span>Conteo ONPE</span>
+        </div>
+        <div class="count-progress">
+          <div class="mini-gradient"><i id="miniNeedle"></i></div>
+          <strong id="countedInline">--</strong>
+        </div>
+        <div class="count-meta">
+          <small id="actasInline">-- de -- actas</small>
+        </div>
       </div>
       <button class="primary-btn" id="refreshBtn">Refrescar resultados</button>
     </section>
-
-    <div class="update-line">
-      <span id="apiDot" class="status-dot"></span>
-      <span id="apiStatus">Conectando con ONPE...</span>
-      <span id="lastUpdate">Esperando carga inicial...</span>
-    </div>
 
     <section class="kpi-grid" aria-label="Indicadores principales">
       <article class="kpi-card">
@@ -97,8 +98,8 @@
         <strong id="processedActs">--</strong>
         <div class="meter"><span id="processedBar"></span></div>
       </article>
-      <article class="kpi-card">
-        <span>Actas contabilizadas</span>
+      <article class="kpi-card pending-card">
+        <span>Actas pendientes</span>
         <strong id="countedActs">--</strong>
         <div class="meter"><span id="countedBar"></span></div>
       </article>
@@ -130,9 +131,12 @@
         <div class="section-title">
           <div>
             <p class="eyebrow">Participación ciudadana</p>
-            <h3>Perú</h3>
+            <h3 id="participationTitle">Perú</h3>
           </div>
-          <span class="tag" id="nationalTag">al --</span>
+          <div class="participation-actions">
+            <button class="scope-toggle" id="participationScopeBtn" type="button">Ver extranjero</button>
+            <span class="tag" id="nationalTag">al --</span>
+          </div>
         </div>
         <canvas id="voteChart" height="190" aria-label="Gráfico de participación"></canvas>
         <div class="participation-list">
@@ -159,6 +163,57 @@
       <p class="projection-note" id="projectionNote">Estimación visual no oficial. Se actualiza con los porcentajes nacionales disponibles.</p>
     </section>
 
+    <section class="panel pending-vote-panel" id="pendiente">
+      <div class="section-title centered-title">
+        <div>
+          <p class="eyebrow">Estimación territorial</p>
+          <h3>Voto que falta contar: neto por departamento</h3>
+          <p class="section-subtitle">Lo NETO que gana el líder de cada depto con el voto restante. Suma los netos = margen final. El exterior va como un todo.</p>
+        </div>
+      </div>
+      <div id="pendingVoteChart" class="pending-vote-chart"></div>
+    </section>
+
+    <section class="panel jee-panel" id="jee">
+      <div class="section-title centered-title">
+        <div>
+          <h3>Actas en el JEE: ¿De dónde provienen y qué efecto tendrían?</h3>
+          <p class="section-subtitle">Actas observadas enviadas al Jurado Electoral Especial, por procedencia, y el aproximado de votos NETO que aportarían a cada candidato según cómo está votando su distrito de origen en esta 2da vuelta.</p>
+        </div>
+      </div>
+      <div id="jeeImpactTable" class="jee-table"></div>
+      <p class="projection-note">Estimado: actas enviadas al JEE × votos por acta de su territorio de origen. No representa votos ya adjudicados.</p>
+    </section>
+
+    <section class="panel world-panel" id="exterior">
+      <div class="section-title centered-title">
+        <div>
+          <h3>¿Cómo votaron los peruanos en el mundo?</h3>
+          <strong id="worldHeadline" class="world-headline">Al -- · -- votos válidos</strong>
+        </div>
+      </div>
+      <div class="world-filters">
+        <label class="world-filter-field">
+          <span>Continente</span>
+          <select id="continentFilter" aria-label="Filtrar continente">
+            <option value="all">🌎 Todos los continentes</option>
+          </select>
+        </label>
+        <label class="world-filter-field">
+          <span>País</span>
+          <select id="countryFilter" aria-label="Filtrar país">
+            <option value="all">Todos los países</option>
+          </select>
+        </label>
+      </div>
+      <div class="world-header">
+        <div class="keiko-header">Keiko <span id="keikoTotal">--</span></div>
+        <div class="sanchez-header">Sánchez <span id="sanchezTotal">--</span></div>
+      </div>
+      <div id="worldVoteRows" class="world-vote-rows"></div>
+      <p class="projection-note" id="worldVoteNote">Datos oficiales ONPE por país. Los porcentajes y votos se actualizan con cada refresco.</p>
+    </section>
+
     <section class="content-grid map-layout" id="mapa">
       <article class="panel map-panel">
         <div class="section-title">
@@ -168,19 +223,6 @@
           </div>
         </div>
         <div id="mapCanvas" class="map-canvas" role="img" aria-label="Mapa interactivo de resultados por regiones"></div>
-      </article>
-
-      <article class="panel table-panel">
-        <div class="section-title">
-          <div>
-            <p class="eyebrow">Territorio</p>
-            <h3>Avance por departamento</h3>
-          </div>
-        </div>
-        <div class="search-box">
-            <input id="regionSearch" type="search" placeholder="Buscar departamento" />
-        </div>
-        <div id="locationRows" class="department-list"></div>
       </article>
     </section>
 
