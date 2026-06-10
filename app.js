@@ -1,38 +1,13 @@
 const API_BASE = 'https://resultadosegundavuelta.onpe.gob.pe/presentacion-backend';
-const ASSETS_BASE = 'https://resultadosegundavuelta.onpe.gob.pe/assets';
 
-const endpoints = {
-  procesoActivo: '/proceso/proceso-electoral-activo',
-  elecciones: '/proceso/3/elecciones',
-  resumenTotales: '/resumen-general/totales?idEleccion=10&tipoFiltro=eleccion',
-  resumenParticipantes: '/resumen-general/participantes?idEleccion=10&tipoFiltro=eleccion',
-  presidencialPorUbicacion: '/eleccion-presidencial/participantes-ubicacion-geografica-nombre?idEleccion=10&tipoFiltro=eleccion',
-  mesasTotales: '/mesa/totales?tipoFiltro=eleccion',
-  mapaCalor: '/resumen-general/mapa-calor?idEleccion=10&tipoFiltro=total',
-  departamentos: '/ubigeos/departamentos?idEleccion=10&idAmbitoGeografico=1',
-  mesasAmbito: '/mesa/totales?tipoFiltro=ambito_geografico&listRegiones=TODOS,PER%C3%9A,EXTRANJERO&ambitoGeografico=1',
-  presidencialPorAmbito: '/eleccion-presidencial/participantes-ubicacion-geografica-nombre?tipoFiltro=ambito_geografico&idAmbitoGeografico=1&listRegiones=TODOS,PER%C3%9A,EXTRANJERO&idEleccion=10',
-  resumenTotalesAmbito: '/resumen-general/totales?idAmbitoGeografico=1&idEleccion=10&tipoFiltro=ambito_geografico',
-  mapaCalorAmbito: '/resumen-general/mapa-calor?idAmbitoGeografico=1&idEleccion=10&tipoFiltro=ambito_geografico',
+// Rutas pedidas con getOnpeUrl (url completa). El resto va por key al proxy; el mapa
+// canónico de endpoints vive en onpe-map.js.
+const exteriorEndpoints = {
   continentesExterior: '/ubigeos/departamentos?idEleccion=10&idAmbitoGeografico=2',
   mapaCalorExterior: '/resumen-general/mapa-calor?idAmbitoGeografico=2&idEleccion=10&tipoFiltro=ambito_geografico',
   presidencialExterior: '/eleccion-presidencial/participantes-ubicacion-geografica-nombre?tipoFiltro=ambito_geografico&idAmbitoGeografico=2&listRegiones=TODOS&idEleccion=10',
-  mesasExterior: '/mesa/totales?tipoFiltro=ambito_geografico&listRegiones=TODOS&ambitoGeografico=2',
-  presidencialPorOrganizacion: '/eleccion-presidencial/participantes-organizacion-politica?idEleccion=10&tipoFiltro=eleccion'
+  mesasExterior: '/mesa/totales?tipoFiltro=ambito_geografico&listRegiones=TODOS&ambitoGeografico=2'
 };
-
-const assetEndpoints = {
-  geodataPeru: '/lib/amcharts5/geodata/json/peruLow.json',
-  geodataContinental: '/lib/amcharts5/geodata/json/continental_total.json'
-};
-
-const API_URLS = Object.fromEntries(
-  Object.entries(endpoints).map(([key, path]) => [key, `${API_BASE}${path}`])
-);
-
-const ASSET_URLS = Object.fromEntries(
-  Object.entries(assetEndpoints).map(([key, path]) => [key, `${ASSETS_BASE}${path}`])
-);
 
 const REFRESH_SECONDS = 120;
 const candidatePhotos = {
@@ -55,12 +30,8 @@ const partyAssets = {
   }
 };
 
-const countryFlags = {
-  ALEMANIA: '🇩🇪', ARGENTINA: '🇦🇷', AUSTRIA: '🇦🇹', BÉLGICA: '🇧🇪', BELGICA: '🇧🇪', BOLIVIA: '🇧🇴', BRASIL: '🇧🇷', CANADA: '🇨🇦', CANADÁ: '🇨🇦', CHILE: '🇨🇱', COLOMBIA: '🇨🇴', 'COSTA RICA': '🇨🇷', CUBA: '🇨🇺', ECUADOR: '🇪🇨', 'EL SALVADOR': '🇸🇻', ESPAÑA: '🇪🇸', ESPANA: '🇪🇸', 'ESTADOS UNIDOS DE AMERICA': '🇺🇸', 'ESTADOS UNIDOS DE ÁMERICA': '🇺🇸', FRANCIA: '🇫🇷', HOLANDA: '🇳🇱', HONDURAS: '🇭🇳', HUNGRIA: '🇭🇺', HUNGRÍA: '🇭🇺', IRLANDA: '🇮🇪', ITALIA: '🇮🇹', JAPON: '🇯🇵', JAPÓN: '🇯🇵', MEXICO: '🇲🇽', MÉXICO: '🇲🇽', NICARAGUA: '🇳🇮', NORUEGA: '🇳🇴', PANAMA: '🇵🇦', PANAMÁ: '🇵🇦', PARAGUAY: '🇵🇾', PORTUGAL: '🇵🇹', 'REPUBLICA DOMINICANA': '🇩🇴', 'REPÚBLICA DOMINICANA': '🇩🇴', SUIZA: '🇨🇭', URUGUAY: '🇺🇾', VENEZUELA: '🇻🇪'
-};
-
 const countryIso = {
-  ALEMANIA: 'de', ARGENTINA: 'ar', AUSTRIA: 'at', BÉLGICA: 'be', BELGICA: 'be', BOLIVIA: 'bo', BRASIL: 'br', CANADA: 'ca', CANADÁ: 'ca', CHILE: 'cl', COLOMBIA: 'co', 'COSTA RICA': 'cr', CUBA: 'cu', ECUADOR: 'ec', 'EL SALVADOR': 'sv', ESPAÑA: 'es', ESPANA: 'es', 'ESTADOS UNIDOS DE AMERICA': 'us', 'ESTADOS UNIDOS DE ÁMERICA': 'us', FRANCIA: 'fr', HOLANDA: 'nl', HONDURAS: 'hn', HUNGRIA: 'hu', HUNGRÍA: 'hu', IRLANDA: 'ie', ITALIA: 'it', JAPON: 'jp', JAPÓN: 'jp', MEXICO: 'mx', MÉXICO: 'mx', NICARAGUA: 'ni', NORUEGA: 'no', PANAMA: 'pa', PANAMÁ: 'pa', PARAGUAY: 'py', PORTUGAL: 'pt', 'REPUBLICA DOMINICANA': 'do', 'REPÚBLICA DOMINICANA': 'do', SUIZA: 'ch', URUGUAY: 'uy', VENEZUELA: 've', FINLANDIA: 'fi', GRECIA: 'gr', GUATEMALA: 'gt', 'GRAN BRETAÑA': 'gb', 'GRAN DUCADO DE LUXEMBURGO': 'lu', LUXEMBURGO: 'lu', DINAMARCA: 'dk', MALTA: 'mt', POLONIA: 'pl', SUECIA: 'se', 'REPÚBLICA CHECA': 'cz', 'REPUBLICA CHECA': 'cz', ISRAEL: 'il', INDIA: 'in', CHINA: 'cn', JAPÓN: 'jp', TURQUÍA: 'tr', TURQUIA: 'tr', 'TRINIDAD Y TOBAGO': 'tt', SUDAFRICA: 'za', SUDÁFRICA: 'za'
+  ALEMANIA: 'de', ARGENTINA: 'ar', AUSTRIA: 'at', BÉLGICA: 'be', BELGICA: 'be', BOLIVIA: 'bo', BRASIL: 'br', CANADA: 'ca', CANADÁ: 'ca', CHILE: 'cl', COLOMBIA: 'co', 'COSTA RICA': 'cr', CUBA: 'cu', ECUADOR: 'ec', 'EL SALVADOR': 'sv', ESPAÑA: 'es', ESPANA: 'es', 'ESTADOS UNIDOS DE AMERICA': 'us', 'ESTADOS UNIDOS DE ÁMERICA': 'us', FRANCIA: 'fr', HOLANDA: 'nl', HONDURAS: 'hn', HUNGRIA: 'hu', HUNGRÍA: 'hu', IRLANDA: 'ie', ITALIA: 'it', JAPON: 'jp', JAPÓN: 'jp', MEXICO: 'mx', MÉXICO: 'mx', NICARAGUA: 'ni', NORUEGA: 'no', PANAMA: 'pa', PANAMÁ: 'pa', PARAGUAY: 'py', PORTUGAL: 'pt', 'REPUBLICA DOMINICANA': 'do', 'REPÚBLICA DOMINICANA': 'do', SUIZA: 'ch', URUGUAY: 'uy', VENEZUELA: 've', FINLANDIA: 'fi', GRECIA: 'gr', GUATEMALA: 'gt', 'GRAN BRETAÑA': 'gb', 'GRAN DUCADO DE LUXEMBURGO': 'lu', LUXEMBURGO: 'lu', DINAMARCA: 'dk', MALTA: 'mt', POLONIA: 'pl', SUECIA: 'se', 'REPÚBLICA CHECA': 'cz', 'REPUBLICA CHECA': 'cz', ISRAEL: 'il', INDIA: 'in', CHINA: 'cn', TURQUÍA: 'tr', TURQUIA: 'tr', 'TRINIDAD Y TOBAGO': 'tt', SUDAFRICA: 'za', SUDÁFRICA: 'za'
 };
 
 const regionIdByName = {
@@ -100,10 +71,13 @@ function canUseProxy() {
   return window.location.protocol === 'http:' || window.location.protocol === 'https:';
 }
 
-function proxiedUrl(name, url) {
-  if (!canUseProxy()) return url;
-  // Se usa key para que el backend arme la URL y no haya problemas con URLs codificadas.
-  return `/api/onpe?key=${encodeURIComponent(name)}`;
+const FETCH_TIMEOUT_MS = 15000;
+
+function fetchWithTimeout(url, options = {}) {
+  const signal = typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
+    ? AbortSignal.timeout(FETCH_TIMEOUT_MS)
+    : undefined;
+  return fetch(url, { ...options, signal });
 }
 
 const fallback = {
@@ -176,18 +150,18 @@ const state = {
   participants: [],
   locations: [],
   chart: null,
-  projectionChart: null,
   map: null,
   mapPopup: null,
   mapReady: false,
   mapLayerReady: false,
-  rankingMode: false,
   participationScope: 'peru',
   worldRows: [],
   refreshTimer: null,
   nextRefreshAt: null,
   ronbProjection: null,
   ronbExterior: null,
+  ronbTimeline: null,
+  stretchMode: 'total',
   loading: false
 };
 
@@ -255,18 +229,13 @@ function findArrays(obj) {
   return arrays;
 }
 
-async function getJson(name, url) {
-  const row = document.querySelector(`[data-api="${name}"] .api-state`);
-  const requestUrl = proxiedUrl(name, url);
-
+async function getJson(name) {
   try {
-    if (row) row.textContent = 'Cargando vía proxy...';
-
     if (!canUseProxy()) {
       throw new Error('Abre el proyecto con npm start o publícalo en Vercel');
     }
 
-    const res = await fetch(requestUrl, {
+    const res = await fetchWithTimeout(`/api/onpe?key=${encodeURIComponent(name)}`, {
       cache: 'no-store',
       headers: { Accept: 'application/json' }
     });
@@ -287,7 +256,6 @@ async function getJson(name, url) {
 
     if (data?.ok === false && data?.type?.startsWith('UPSTREAM_')) {
       state.api[name] = data.type;
-      if (row) row.textContent = 'ONPE no disponible; usando respaldo';
       return null;
     }
 
@@ -299,11 +267,9 @@ async function getJson(name, url) {
       throw new Error(`${msg}${tipo}`);
     }
     state.api[name] = 'OK';
-    if (row) row.textContent = 'Conectado vía proxy';
     return data;
   } catch (error) {
     state.api[name] = error.message;
-    if (row) row.textContent = `Error: ${error.message}`;
     if (!error.message.includes('Endpoint JSON de ONPE no disponible')) console.warn(`No se pudo cargar ${name}`, error);
     return null;
   }
@@ -311,7 +277,7 @@ async function getJson(name, url) {
 
 async function getOnpeUrl(path) {
   const target = path.startsWith('http') ? path : `${API_BASE}${path}`;
-  const res = await fetch(`/api/onpe?url=${encodeURIComponent(target)}`, {
+  const res = await fetchWithTimeout(`/api/onpe?url=${encodeURIComponent(target)}`, {
     cache: 'no-store',
     headers: { Accept: 'application/json' }
   });
@@ -324,7 +290,7 @@ async function getOnpeUrl(path) {
 async function getRonb(resource, query = '') {
   if (!canUseProxy()) return null;
   const suffix = query ? `?${query}` : '';
-  const res = await fetch(`/api/ronb/${encodeURIComponent(resource)}${suffix}`, {
+  const res = await fetchWithTimeout(`/api/ronb/${encodeURIComponent(resource)}${suffix}`, {
     cache: 'no-store',
     headers: { Accept: 'application/json' }
   });
@@ -332,6 +298,21 @@ async function getRonb(resource, query = '') {
   if (data?.ok === false && data?.type?.startsWith('UPSTREAM_')) return null;
   if (!res.ok || data?.ok === false) return null;
   return data;
+}
+
+// Ejecuta `task` sobre `items` con un máximo de `limit` peticiones en vuelo,
+// para no disparar decenas de requests simultáneos contra el proxy.
+async function mapWithConcurrency(items, limit, task) {
+  const results = new Array(items.length);
+  let nextIndex = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (nextIndex < items.length) {
+      const current = nextIndex++;
+      results[current] = await task(items[current], current);
+    }
+  });
+  await Promise.all(workers);
+  return results;
 }
 
 function ronbTotals(national = {}) {
@@ -414,10 +395,10 @@ function ronbExteriorParticipants(snapshot = {}) {
 }
 
 function ronbTerritoryRows(snapshot = {}, projection = {}) {
-  const projectedByName = new Map((projection.por_departamento || []).map(row => [normalizeText(row.dept || ''), row]));
+  const projectedByName = new Map((projection.por_departamento || []).map(row => [regionKey(row.dept || ''), row]));
   return (snapshot.regiones || []).map(row => {
     const isExterior = String(row.ubigeo || '') === '__exterior__';
-    const projected = projectedByName.get(isExterior ? 'EXTERIOR' : normalizeText(row.nombre || '')) || {};
+    const projected = projectedByName.get(isExterior ? 'EXTERIOR' : regionKey(row.nombre || '')) || {};
     const validVotes = toNumber(row.votos_validos) || toNumber(row.candidatos?.A?.votos) + toNumber(row.candidatos?.B?.votos);
     const net = toNumber(row.candidatos?.A?.votos) - toNumber(row.candidatos?.B?.votos);
     return {
@@ -453,20 +434,6 @@ function ronbWorldRows(exterior = {}) {
         sanchezPct: (toNumber(country.sanchez) / total) * 100
       };
     })).sort((a, b) => b.validVotes - a.validVotes);
-}
-
-function setupApiList() {
-  const apiList = qs('apiList');
-  if (!apiList) return;
-  const apiEntries = { ...API_URLS, ...ASSET_URLS };
-  apiList.innerHTML = Object.entries(apiEntries).map(([key, url]) => `
-    <div class="api-item" data-api="${key}">
-      <strong>${key}</strong>
-      <code>${url}</code>
-      <small>Proxy: <code>/api/onpe?key=${key}</code>. Estado: <code>/api/health</code>. Prueba ONPE: <code>/api/test</code>.</small>
-      <div class="api-state">Pendiente</div>
-    </div>
-  `).join('');
 }
 
 function normalizeTotals(raw, mesasRaw = {}) {
@@ -616,29 +583,38 @@ function partyInfo(organizacion = '') {
 
 function partyLabel(organizacion = '') {
   const info = partyInfo(organizacion);
-  const logo = info.logo ? `<img src="${info.logo}" alt="${organizacion}" loading="lazy" referrerpolicy="no-referrer">` : '';
-  return `<span class="party-label">${logo}<span>${organizacion || '--'}</span></span>`;
-}
-
-function renderAvatar(elementId, candidate) {
-  const element = qs(elementId);
-  const photo = candidatePhoto(candidate?.nombre || '');
-  const fallbackPhoto = candidateFallbackPhoto(candidate?.nombre || '');
-  const fallbackText = initials(candidate?.nombre || '');
-  if (!element) return;
-  element.innerHTML = photo
-    ? `<img src="${photo}" alt="${shortCandidateName(candidate?.nombre || '')}" loading="lazy" referrerpolicy="no-referrer" onerror="if('${fallbackPhoto}' && this.src !== '${fallbackPhoto}') { this.src='${fallbackPhoto}'; } else { this.remove();this.parentElement.textContent='${fallbackText}'; }">`
-    : fallbackText;
+  const logo = info.logo ? `<img src="${escapeHtml(info.logo)}" alt="${escapeHtml(organizacion)}" loading="lazy" referrerpolicy="no-referrer">` : '';
+  return `<span class="party-label">${logo}<span>${escapeHtml(organizacion) || '--'}</span></span>`;
 }
 
 function avatarMarkup(candidate) {
   const photo = candidatePhoto(candidate?.nombre || '');
   const fallbackPhoto = candidateFallbackPhoto(candidate?.nombre || '');
   const fallbackText = initials(candidate?.nombre || '');
-  return photo
-    ? `<img src="${photo}" alt="${shortCandidateName(candidate?.nombre || '')}" loading="lazy" referrerpolicy="no-referrer" onerror="if('${fallbackPhoto}' && this.src !== '${fallbackPhoto}') { this.src='${fallbackPhoto}'; } else { this.remove();this.parentElement.textContent='${fallbackText}'; }">`
-    : fallbackText;
+  if (!photo) return escapeHtml(fallbackText);
+  return `<img src="${escapeHtml(photo)}" alt="${escapeHtml(shortCandidateName(candidate?.nombre || ''))}" loading="lazy" referrerpolicy="no-referrer" data-avatar data-fallback-src="${escapeHtml(fallbackPhoto)}" data-fallback-text="${escapeHtml(fallbackText)}">`;
 }
+
+function renderAvatar(elementId, candidate) {
+  const element = qs(elementId);
+  if (!element) return;
+  element.innerHTML = avatarMarkup(candidate);
+}
+
+// Fallback de fotos sin handlers inline: primero la foto alternativa, luego iniciales.
+document.addEventListener('error', (event) => {
+  const img = event.target;
+  if (!(img instanceof HTMLImageElement) || !img.hasAttribute('data-avatar')) return;
+  const fallbackSrc = img.dataset.fallbackSrc;
+  if (fallbackSrc && img.src !== fallbackSrc) {
+    img.src = fallbackSrc;
+    return;
+  }
+  const parent = img.parentElement;
+  const fallbackText = img.dataset.fallbackText || '--';
+  img.remove();
+  if (parent) parent.textContent = fallbackText;
+}, true);
 
 function updateRefreshCountdown() {
   if (!state.nextRefreshAt) return;
@@ -657,9 +633,15 @@ function scheduleAutoRefresh() {
   updateRefreshCountdown();
   state.refreshTimer = window.setInterval(() => {
     updateRefreshCountdown();
+    // Con la pestaña oculta no se refresca; al volver, visibilitychange recupera el ciclo.
+    if (document.hidden) return;
     if (Date.now() >= state.nextRefreshAt && !state.loading) loadData();
   }, 1000);
 }
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && state.nextRefreshAt && Date.now() >= state.nextRefreshAt && !state.loading) loadData();
+});
 
 function extractData(raw) {
   return raw?.data ?? raw;
@@ -667,6 +649,12 @@ function extractData(raw) {
 
 function normalizeText(value = '') {
   return String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
+}
+
+// La API de proyecci\u00f3n nombra departamentos con guion bajo (LA_LIBERTAD); el
+// snapshot usa espacios (La Libertad). Esta key uniforma ambos para cruzarlos.
+function regionKey(value = '') {
+  return normalizeText(value).replace(/_/g, ' ');
 }
 
 function regionColor(value) {
@@ -682,7 +670,9 @@ function regionColor(value) {
 
 function updateDuel(participants, totalsRaw) {
   const data = extractData(totalsRaw) || {};
-  const counted = toNumber(data.actasContabilizadas || data.porcentajeActasContabilizadas);
+  // porcentaje primero: en el esquema crudo de ONPE actasContabilizadas es un conteo, no un %.
+  const countedRaw = toNumber(data.porcentajeActasContabilizadas || data.actasContabilizadas);
+  const counted = countedRaw > 100 ? 0 : countedRaw;
   const countedLabel = counted ? pct3(counted) : '--';
   const totalActas = toNumber(data.totalActas);
   const contabilizadas = toNumber(data.contabilizadas);
@@ -843,12 +833,30 @@ function sketchPath(points) {
   return points.map((point, index) => `${index ? 'L' : 'M'}${point[0].toFixed(1)} ${point[1].toFixed(1)}`).join(' ');
 }
 
+// Convierte la timeline de RonBStudio (snapshots reales del conteo) en puntos de la
+// curva contada: x = % de actas, y = % de cada candidato.
+function ronbTimelineCurve(currentX) {
+  const entries = state.ronbTimeline?.entries || [];
+  const byActas = new Map();
+  entries.forEach(entry => {
+    const actas = toNumber(entry.pct_actas);
+    const keiko = toNumber(entry.pa);
+    const sanchez = toNumber(entry.pb);
+    if (actas <= 0 || actas >= currentX || !keiko || !sanchez) return;
+    byActas.set(actas.toFixed(2), { actas, keiko, sanchez, projected: false });
+  });
+  const points = [...byActas.values()].sort((a, b) => a.actas - b.actas);
+  const step = Math.ceil(points.length / 90) || 1;
+  return points.filter((point, index) => index % step === 0 || index === points.length - 1);
+}
+
 function renderProjectionChart(participants, totalsRaw) {
   const mount = qs('projectionSketch');
   if (!mount) return;
 
   const data = extractData(totalsRaw) || {};
-  const counted = Math.max(toNumber(data.actasContabilizadas || data.porcentajeActasContabilizadas), 1);
+  const countedRaw = toNumber(data.porcentajeActasContabilizadas || data.actasContabilizadas);
+  const counted = Math.max(countedRaw > 100 ? 0 : countedRaw, 1);
   const keiko = participants.find(p => normalizeText(p.organizacion).includes('FUERZA'));
   const roberto = participants.find(p => normalizeText(p.organizacion).includes('JUNTOS'));
   if (!keiko || !roberto) return;
@@ -867,26 +875,50 @@ function renderProjectionChart(participants, totalsRaw) {
   const leader = kProjected >= rProjected ? keiko : roberto;
   const gap = Math.abs(kProjected - rProjected);
   const chart = { left: 76, right: 872, top: 42, bottom: 278, minY: 46, maxY: 59 };
-  const x = value => chart.left + (value / 100) * (chart.right - chart.left);
   const y = value => chart.bottom - ((value - chart.minY) / (chart.maxY - chart.minY)) * (chart.bottom - chart.top);
-  const projectionX = x(currentX);
   const clampPct = value => Math.max(chart.minY, Math.min(chart.maxY, value));
   const smoothstep = value => value * value * (3 - 2 * value);
-  const countedSamples = [0, 1, 2, 4, 8, 14, 22, 32, 44, 52, currentX]
-    .filter((value, index, list) => value <= currentX && list.indexOf(value) === index);
-  if (!countedSamples.includes(currentX)) countedSamples.push(currentX);
   const projectionSamples = Array.from({ length: 13 }, (_, index) => currentX + ((100 - currentX) * index / 12))
-    .filter((value, index, list) => value >= currentX && value <= 100 && list.findIndex(x => Math.abs(x - value) < 0.001) === index);
-  const countedCurve = countedSamples.map(actas => {
-    const progress = currentX ? actas / currentX : 1;
-    const lateDrop = smoothstep(Math.max(0, (progress - 0.68) / 0.32));
-    const earlySpike = Math.exp(-Math.pow((progress - 0.015) / 0.018, 2)) * 1.25;
-    const baseline = kCurrent + 2.65 * (1 - lateDrop) + earlySpike;
-    const ripple = Math.sin(progress * Math.PI * 8) * 0.055 + Math.sin(progress * Math.PI * 17) * 0.025;
-    const keikoPct = clampPct(baseline + ripple);
-    return { actas, keiko: keikoPct, sanchez: 100 - keikoPct, projected: false };
-  });
-  countedCurve[countedCurve.length - 1] = { actas: currentX, keiko: kCurrent, sanchez: rCurrent, projected: false };
+    .filter((value, index, list) => value >= currentX && value <= 100 && list.findIndex(sample => Math.abs(sample - value) < 0.001) === index);
+  const timelinePoints = ronbTimelineCurve(currentX).map(point => ({
+    ...point,
+    keiko: clampPct(point.keiko),
+    sanchez: clampPct(point.sanchez)
+  }));
+  let countedCurve;
+  if (timelinePoints.length >= 2) {
+    // Historia real del conteo (snapshots de RonBStudio) rematada en el punto actual.
+    countedCurve = [...timelinePoints, { actas: currentX, keiko: kCurrent, sanchez: rCurrent, projected: false }];
+  } else {
+    // Sin timeline disponible: curva sintética solo como respaldo visual.
+    const countedSamples = [0, 1, 2, 4, 8, 14, 22, 32, 44, 52, currentX]
+      .filter((value, index, list) => value <= currentX && list.indexOf(value) === index);
+    if (!countedSamples.includes(currentX)) countedSamples.push(currentX);
+    countedCurve = countedSamples.map(actas => {
+      const progress = currentX ? actas / currentX : 1;
+      const lateDrop = smoothstep(Math.max(0, (progress - 0.68) / 0.32));
+      const earlySpike = Math.exp(-Math.pow((progress - 0.015) / 0.018, 2)) * 1.25;
+      const baseline = kCurrent + 2.65 * (1 - lateDrop) + earlySpike;
+      const ripple = Math.sin(progress * Math.PI * 8) * 0.055 + Math.sin(progress * Math.PI * 17) * 0.025;
+      const keikoPct = clampPct(baseline + ripple);
+      return { actas, keiko: keikoPct, sanchez: 100 - keikoPct, projected: false };
+    });
+    countedCurve[countedCurve.length - 1] = { actas: currentX, keiko: kCurrent, sanchez: rCurrent, projected: false };
+  }
+  // Eje X dinámico: si la historia real del conteo empieza tarde (la timeline se
+  // capturó con el conteo avanzado), el eje arranca cerca del primer dato en vez
+  // de dejar medio gráfico vacío.
+  let axisMin = 0;
+  if (timelinePoints.length >= 2) {
+    axisMin = Math.max(0, Math.floor((countedCurve[0].actas - 2) / 5) * 5);
+  }
+  const xRange = Math.max(100 - axisMin, 1);
+  const xStep = xRange <= 10 ? 2 : xRange <= 25 ? 5 : xRange <= 50 ? 10 : 20;
+  axisMin = Math.floor(axisMin / xStep) * xStep;
+  const x = value => chart.left + ((value - axisMin) / (100 - axisMin)) * (chart.right - chart.left);
+  const projectionX = x(currentX);
+  const xTicks = [];
+  for (let tick = axisMin; tick <= 100; tick += xStep) xTicks.push(tick);
   const projectionCurve = projectionSamples.slice(1).map(actas => {
     const progress = (actas - currentX) / Math.max(100 - currentX, 1);
     const ease = progress * progress * (3 - 2 * progress);
@@ -924,7 +956,7 @@ function renderProjectionChart(participants, totalsRaw) {
         <rect class="sketch-paper" x="18" y="18" width="904" height="324" rx="4"/>
         <g class="sketch-grid">
           ${[46,48,50,52,54,56,58,59].map(v => `<line x1="${chart.left}" y1="${y(v)}" x2="${chart.right}" y2="${y(v)}"/><text x="42" y="${y(v) + 4}">${v}%</text>`).join('')}
-          ${[0,20,40,60,80,100].map(v => `<line x1="${x(v)}" y1="${chart.top}" x2="${x(v)}" y2="${chart.bottom}"/><text x="${x(v) - 8}" y="314">${v}%</text>`).join('')}
+          ${xTicks.map(v => `<line x1="${x(v)}" y1="${chart.top}" x2="${x(v)}" y2="${chart.bottom}"/><text x="${x(v) - 8}" y="314">${v}%</text>`).join('')}
         </g>
         <rect class="projection-zone" x="${projectionX}" y="${chart.top}" width="${x(100) - projectionX}" height="${chart.bottom - chart.top}" fill="url(#projectionHatch)"/>
         <line class="projection-cut" x1="${projectionX}" y1="${chart.top}" x2="${projectionX}" y2="${chart.bottom}"/>
@@ -957,9 +989,11 @@ function renderProjectionChart(participants, totalsRaw) {
   const keikoDot = mount.querySelector('#projectionKeikoDot');
   const robertoDot = mount.querySelector('#projectionRobertoDot');
   const interpolatePoint = actas => {
-    const clamped = Math.max(0, Math.min(100, actas));
-    let prev = points[0];
-    let next = points[points.length - 1];
+    // Se ancla al rango con datos: el hover nunca se sale de la curva dibujada.
+    const clamped = Math.max(points[0].actas, Math.min(100, actas));
+    // Si actas supera el último punto, se devuelve el último en vez de mezclar extremos.
+    let prev = points[points.length - 1];
+    let next = prev;
     for (let i = 1; i < points.length; i++) {
       if (points[i].actas >= clamped) {
         prev = points[i - 1];
@@ -1005,7 +1039,7 @@ function renderProjectionChart(participants, totalsRaw) {
     if (!svg) return;
     const rect = svg.getBoundingClientRect();
     const svgX = ((clientX - rect.left) / Math.max(rect.width, 1)) * 940;
-    const actas = ((svgX - chart.left) / (chart.right - chart.left)) * 100;
+    const actas = axisMin + ((svgX - chart.left) / (chart.right - chart.left)) * (100 - axisMin);
     showPoint(interpolatePoint(actas));
   };
   mount.querySelectorAll('.projection-hotspot').forEach(hotspot => {
@@ -1025,25 +1059,6 @@ function renderProjectionChart(participants, totalsRaw) {
     overlay.addEventListener('focus', () => showPoint(interpolatePoint(currentX)));
   }
   mount.querySelector('.projection-chart-shell')?.addEventListener('mouseleave', hidePoint);
-}
-
-function renderLocations(rows = state.locations) {
-  if (!qs('locationRows')) return;
-  const topRows = rows.slice(0, 80);
-  qs('locationRows').innerHTML = topRows.map((x, index) => `
-    <article class="department-card" style="--dept-color:${regionColor(x.porcentaje)};--dept-progress:${Math.min(Number(x.porcentaje || 0), 100)}%">
-      <div class="department-rank">${String(index + 1).padStart(2, '0')}</div>
-      <div class="department-main">
-        <div class="department-name">${escapeHtml(x.ubicacion)}</div>
-        <div class="department-status">${escapeHtml(x.ganador)}</div>
-        <div class="department-meter"><span></span></div>
-      </div>
-      <div class="department-score">
-        <strong>${pct3(x.porcentaje)}</strong>
-        <span>${x.votos ? fmt.format(x.votos) : '--'} actas</span>
-      </div>
-    </article>
-  `).join('') || '<p class="muted">No se encontraron datos de ubicacion en la respuesta actual.</p>';
 }
 
 function candidatePair(raw) {
@@ -1074,7 +1089,7 @@ function countryFlag(name = '') {
 
 async function loadWorldCountryRows(continentsRaw) {
   const continents = extractData(continentsRaw) || [];
-  const countryLists = await Promise.all(continents.map(async continent => {
+  const countryLists = await mapWithConcurrency(continents, 4, async continent => {
     const continentId = String(continent.ubigeo || '').padStart(6, '0');
     try {
       const countriesRaw = await getOnpeUrl(`/ubigeos/provincias?idEleccion=10&idAmbitoGeografico=2&idUbigeoDepartamento=${continentId}`);
@@ -1088,10 +1103,10 @@ async function loadWorldCountryRows(continentsRaw) {
     } catch (error) {
       return [];
     }
-  }));
+  });
 
   const countryRefs = countryLists.flat();
-  const rows = await Promise.all(countryRefs.map(async ref => {
+  const rows = await mapWithConcurrency(countryRefs, 6, async ref => {
     try {
       const [totalsRaw, participantsRaw] = await Promise.all([
         getOnpeUrl(`/resumen-general/totales?idEleccion=10&tipoFiltro=ubigeo_nivel_02&idAmbitoGeografico=2&idUbigeoDepartamento=${ref.continentId}&idUbigeoProvincia=${ref.countryId}`),
@@ -1116,7 +1131,7 @@ async function loadWorldCountryRows(continentsRaw) {
     } catch (error) {
       return null;
     }
-  }));
+  });
 
   return rows.filter(Boolean).sort((a, b) => b.validVotes - a.validVotes);
 }
@@ -1212,49 +1227,34 @@ async function renderWorldVote(continentsRaw, heatRaw, exteriorRaw) {
 
   const keikoTotal = qs('keikoTotal');
   const sanchezTotal = qs('sanchezTotal');
-  if (keikoTotal) keikoTotal.textContent = `${pct3(worldPair.keiko.porcentaje)}% · ${fmt.format(worldPair.keiko.votos)}`;
-  if (sanchezTotal) sanchezTotal.textContent = `${pct3(worldPair.sanchez.porcentaje)}% · ${fmt.format(worldPair.sanchez.votos)}`;
+  if (keikoTotal) keikoTotal.textContent = `${pct3(worldPair.keiko.porcentaje)} · ${fmt.format(worldPair.keiko.votos)}`;
+  if (sanchezTotal) sanchezTotal.textContent = `${pct3(worldPair.sanchez.porcentaje)} · ${fmt.format(worldPair.sanchez.votos)}`;
   const worldHeader = document.querySelector('.world-panel .world-header');
   if (worldHeader) {
     worldHeader.style.setProperty('--world-keiko', `${Math.max(0, Math.min(worldPair.keiko.porcentaje || 0, 100))}%`);
     worldHeader.style.setProperty('--world-sanchez', `${Math.max(0, Math.min(worldPair.sanchez.porcentaje || 0, 100))}%`);
   }
 
+  // Reconstruir opciones sin perder la selección del usuario entre refrescos.
+  const restoreSelection = (select, rebuild) => {
+    if (!select) return;
+    const previous = select.value;
+    rebuild();
+    if ([...select.options].some(option => option.value === previous)) select.value = previous;
+  };
   const continentFilter = qs('continentFilter');
-  if (continentFilter) {
+  restoreSelection(continentFilter, () => {
     const continents = [...new Set(rows.map(row => row.continent || row.name).filter(Boolean))].sort();
     continentFilter.innerHTML = '<option value="all">🌎 Todos los continentes</option>' + continents.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
-  }
+  });
   const countryFilter = qs('countryFilter');
-  if (countryFilter) {
+  restoreSelection(countryFilter, () => {
     countryFilter.innerHTML = '<option value="all">Todos los países</option>' + rows.map(row => row.country).filter(Boolean).sort().map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
-  }
+  });
   state.worldRows = rows;
   renderWorldVoteRows(rows);
   const note = qs('worldVoteNote');
   if (note && rows.some(row => row.country)) note.textContent = 'Datos oficiales ONPE por país. Los porcentajes y votos se actualizan con cada refresco.';
-}
-
-function buildPendingVoteRows(locations, totalsRaw, exteriorRaw) {
-  const pair = candidatePair(totalsRaw);
-  const exteriorPair = candidatePair(exteriorRaw);
-  const nationalTotal = Math.max(pair.keiko.votos + pair.sanchez.votos, 1);
-  const nationalMargin = (pair.keiko.votos - pair.sanchez.votos) / nationalTotal;
-  const exteriorTotal = Math.max(exteriorPair.keiko.votos + exteriorPair.sanchez.votos, 1);
-  const exteriorMargin = (exteriorPair.keiko.votos - exteriorPair.sanchez.votos) / exteriorTotal;
-  const avgVotesPerActa = Math.max(nationalTotal / Math.max(locations.reduce((sum, row) => sum + (row.votos || 0), 0), 1), 1);
-
-  const rows = locations.map(row => {
-    const pendingActas = row.porcentaje ? (row.votos || 0) * ((100 - row.porcentaje) / Math.max(row.porcentaje, 1)) : 0;
-    const net = Math.round(pendingActas * avgVotesPerActa * nationalMargin);
-    return { name: row.ubicacion, net, pendingActas };
-  });
-
-  if (exteriorPair.keiko.votos || exteriorPair.sanchez.votos) {
-    rows.push({ name: 'Exterior', net: Math.round(exteriorTotal * Math.max(0, 100 - toNumber(deepFind(state.raw.mesasExteriorRaw, ['porcentajeActasContabilizadas']))) / 100 * exteriorMargin), pendingActas: 0 });
-  }
-
-  return rows.filter(row => Math.abs(row.net) > 0).sort((a, b) => b.net - a.net);
 }
 
 async function loadTerritoryDetailRows(departamentosRaw, continentsRaw) {
@@ -1272,7 +1272,7 @@ async function loadTerritoryDetailRows(departamentosRaw, continentsRaw) {
   }));
 
   const refs = [...departments, ...continents];
-  const rows = await Promise.all(refs.map(async ref => {
+  const rows = await mapWithConcurrency(refs, 6, async ref => {
     try {
       const [totalsRaw, participantsRaw] = await Promise.all([
         getOnpeUrl(`/resumen-general/totales?idEleccion=10&tipoFiltro=ubigeo_nivel_01&idAmbitoGeografico=${ref.ambito}&idUbigeoDepartamento=${ref.ubigeo}`),
@@ -1296,7 +1296,7 @@ async function loadTerritoryDetailRows(departamentosRaw, continentsRaw) {
     } catch (error) {
       return null;
     }
-  }));
+  });
   return rows.filter(Boolean);
 }
 
@@ -1342,6 +1342,105 @@ function renderPendingVote(territories) {
     </div>
     <div class="pending-axis-label">Voto NETO aprox. que gana el líder del depto (← Sánchez · Keiko →)</div>`;
 
+}
+
+// "Análisis de la recta final": brecha actual + lo que aporta cada bloque de actas
+// pendientes (según la proyección distrital de RonBStudio) hasta llegar al 100%.
+function buildFinalStretchData() {
+  const snapshot = state.raw.ronbSnapshot;
+  const projection = state.ronbProjection;
+  const national = snapshot?.national;
+  if (!national || !Array.isArray(projection?.por_departamento)) return null;
+
+  const nets = new Map(projection.por_departamento.map(d => [regionKey(d.dept), toNumber(d.addK) - toNumber(d.addS)]));
+
+  const regions = (snapshot.regiones || []).map(r => ({
+    key: String(r.ubigeo || '') === '__exterior__' ? 'EXTERIOR' : regionKey(r.nombre),
+    isExterior: String(r.ubigeo || '') === '__exterior__',
+    jee: toNumber(r.actas_enviadas_jee),
+    onpe: Math.max(0, toNumber(r.actas_total) - toNumber(r.actas_contabilizadas) - toNumber(r.actas_enviadas_jee))
+  }));
+  const sumActas = filter => regions.filter(filter).reduce(
+    (acc, r) => ({ jee: acc.jee + r.jee, onpe: acc.onpe + r.onpe }),
+    { jee: 0, onpe: 0 }
+  );
+  const isLimaCallao = r => !r.isExterior && (r.key === 'LIMA' || r.key === 'CALLAO');
+
+  const gapNow = toNumber(national.candidatos?.A?.votos) - toNumber(national.candidatos?.B?.votos);
+  const limaCallaoNet = (nets.get('LIMA') || 0) + (nets.get('CALLAO') || 0);
+  const exteriorNet = nets.get('EXTERIOR') || 0;
+  let othersNet = 0;
+  nets.forEach((net, key) => {
+    if (key !== 'LIMA' && key !== 'CALLAO' && key !== 'EXTERIOR') othersNet += net;
+  });
+  const projNet = gapNow + limaCallaoNet + exteriorNet + othersNet;
+
+  const limaCallaoActas = sumActas(isLimaCallao);
+  const exteriorActas = sumActas(r => r.isExterior);
+  const othersActas = sumActas(r => !r.isExterior && !isLimaCallao(r));
+  const actasSub = actas => `ONPE: ${fmt.format(actas.onpe)} · JEE: ${fmt.format(actas.jee)} actas`;
+
+  const proyKeiko = toNumber(projection.proy_keiko);
+  const proyLeader = proyKeiko >= 50 ? 'Keiko' : 'Sánchez';
+  const proyLeaderPct = Math.max(proyKeiko, 100 - proyKeiko);
+
+  return {
+    rows: [
+      { title: 'Brecha actual', sub: `${pct(toNumber(national.pct_actas))} contado`, net: gapNow, exact: true },
+      { title: '+ Lima y Callao', sub: actasSub(limaCallaoActas), net: limaCallaoNet, ...limaCallaoActas, splittable: true },
+      { title: '+ Exterior', sub: actasSub(exteriorActas), net: exteriorNet, ...exteriorActas, splittable: true },
+      { title: '− Excluyendo Lima y Callao', sub: actasSub(othersActas), net: othersNet, ...othersActas, splittable: true },
+      { title: 'Proyección 100%', sub: `${proyLeader} ${pct(proyLeaderPct)}`, net: projNet, total: true }
+    ]
+  };
+}
+
+function stretchRowMarkup(row, max, mode) {
+  const widthPct = Math.max(1.5, Math.abs(row.net) / max * 47);
+  const positive = row.net >= 0;
+  const sideClass = positive ? 'keiko-text' : 'sanchez-text';
+  const valueName = positive ? 'Keiko' : 'Sánchez';
+  const sign = row.exact ? '+' : '~+';
+  const side = positive ? 'left' : 'right';
+  const colorClass = positive ? 'seg-keiko' : 'seg-sanchez';
+  let segments;
+  if (mode === 'tipo' && row.splittable && (row.jee || row.onpe)) {
+    const jeeShare = row.jee / Math.max(row.jee + row.onpe, 1);
+    const jeeW = widthPct * jeeShare;
+    const onpeW = widthPct - jeeW;
+    if (onpeW < 0.2) {
+      segments = `<i class="seg seg-jee seg-round" style="${side}:50%;width:${jeeW.toFixed(2)}%"></i>`;
+    } else if (jeeW < 0.2) {
+      segments = `<i class="seg ${colorClass} seg-round" style="${side}:50%;width:${onpeW.toFixed(2)}%"></i>`;
+    } else {
+      segments = `<i class="seg seg-jee" style="${side}:50%;width:${jeeW.toFixed(2)}%"></i><i class="seg ${colorClass}" style="${side}:calc(50% + ${jeeW.toFixed(2)}%);width:${onpeW.toFixed(2)}%"></i>`;
+    }
+  } else {
+    segments = `<i class="seg ${colorClass} seg-round" style="${side}:50%;width:${widthPct.toFixed(2)}%"></i>`;
+  }
+  return `
+    <div class="stretch-row${row.total ? ' total-row' : ''}">
+      <div class="stretch-label"><strong>${escapeHtml(row.title)}</strong><span>${escapeHtml(row.sub)}</span></div>
+      <div class="stretch-bar">${segments}</div>
+      <div class="stretch-value ${sideClass}">${valueName} ${sign}${fmt.format(Math.abs(row.net))}</div>
+    </div>`;
+}
+
+function renderFinalStretch() {
+  const panel = qs('rectaFinal');
+  const mount = qs('finalStretch');
+  if (!panel || !mount) return;
+  const data = buildFinalStretchData();
+  // Sin datos de RonBStudio no hay proyección distrital: el panel se oculta.
+  panel.hidden = !data;
+  if (!data) return;
+  const mode = state.stretchMode;
+  const max = Math.max(...data.rows.map(row => Math.abs(row.net)), 1);
+  mount.innerHTML = `
+    <div class="stretch-sides"><span class="sanchez-side">◂ SÁNCHEZ</span><span class="keiko-side">KEIKO ▸</span></div>
+    ${mode === 'tipo' ? '<p class="stretch-legend"><i></i><strong>En el JEE (observadas)</strong> · el resto, por contar en ONPE</p>' : ''}
+    ${data.rows.map(row => stretchRowMarkup(row, max, mode)).join('')}
+  `;
 }
 
 function renderJeeImpact(territories = []) {
@@ -1663,7 +1762,28 @@ function renderInteractiveMap(rows, geoRaw, departamentosRaw, heatAmbitoRaw) {
   return true;
 }
 
+function updateMapTopline(metrics) {
+  const topline = document.querySelector('#mapCanvas .map-topline');
+  if (!topline) return;
+  topline.innerHTML = topUniqueRegions(metrics).map(region => `<span>${escapeHtml(region.name)}: <b>${pct3(region.percentage)}</b></span>`).join('');
+}
+
 function renderMap(rows, geoRaw, departamentosRaw, heatAmbitoRaw) {
+  const geo = extractData(geoRaw) || geoRaw;
+  const features = Array.isArray(geo?.features) ? geo.features : [];
+
+  // Si el mapa ya está montado, solo se actualizan los datos: sin parpadeo,
+  // sin re-descargar tiles y sin perder el zoom/posición del usuario.
+  if (state.map && state.mapLayerReady && features.length) {
+    const source = state.map.getSource('onpe-regions');
+    if (source) {
+      const metrics = buildRegionMetrics(departamentosRaw, heatAmbitoRaw);
+      source.setData({ type: 'FeatureCollection', features: buildMapFeatures(features, metrics, rows) });
+      updateMapTopline(metrics);
+      return;
+    }
+  }
+
   if (state.map) {
     state.map.remove();
     state.map = null;
@@ -1702,130 +1822,143 @@ function updateStatus(success) {
 async function loadData() {
   if (state.loading) return;
   state.loading = true;
-  qs('refreshBtn').disabled = true;
-  qs('refreshBtn').textContent = 'Actualizando...';
-  setupApiList();
-
-  let procesoRaw, eleccionesRaw, totalsRaw, participantsRaw, locationsRaw, tablesRaw, heatRaw, departamentosRaw, mesasAmbitoRaw, totalsAmbitoRaw, heatAmbitoRaw, continentesExteriorRaw, heatExteriorRaw, presidencialExteriorRaw, mesasExteriorRaw, orgRaw, geoPeruRaw, geoRaw, ronbSnapshot, ronbProjection, ronbExterior;
+  const refreshBtn = qs('refreshBtn');
+  if (refreshBtn) {
+    refreshBtn.disabled = true;
+    refreshBtn.classList.add('is-loading');
+    refreshBtn.textContent = 'Actualizando...';
+  }
 
   try {
-    [ronbSnapshot, ronbProjection, ronbExterior, geoPeruRaw, geoRaw] = await Promise.all([
-      getRonb('snapshot').catch(() => null),
-      getRonb('proyeccion').catch(() => null),
-      getRonb('exterior-paises').catch(() => null),
-      getJson('geodataPeru', ASSET_URLS.geodataPeru).catch(() => null),
-      getJson('geodataContinental', ASSET_URLS.geodataContinental).catch(() => null)
-    ]);
+    let procesoRaw, eleccionesRaw, totalsRaw, participantsRaw, locationsRaw, tablesRaw, heatRaw, departamentosRaw, mesasAmbitoRaw, totalsAmbitoRaw, heatAmbitoRaw, continentesExteriorRaw, heatExteriorRaw, presidencialExteriorRaw, mesasExteriorRaw, orgRaw, geoPeruRaw, geoRaw, ronbSnapshot, ronbProjection, ronbExterior, ronbTimeline;
 
-    if (ronbSnapshot) {
-      totalsRaw = ronbTotals(ronbSnapshot.national);
-      participantsRaw = { data: ronbParticipants(ronbSnapshot) };
-      departamentosRaw = { data: ronbDepartmentRefs(ronbSnapshot) };
-      heatAmbitoRaw = { data: ronbHeatRows(ronbSnapshot) };
-      totalsAmbitoRaw = { data: ronbTotalsByScope(ronbSnapshot) };
-      presidencialExteriorRaw = ronbExteriorParticipants(ronbSnapshot);
-    }
-  } catch (e) {
-    ronbSnapshot = null;
-  }
-
-  if (!ronbSnapshot) {
     try {
-      [
-        procesoRaw,
-        eleccionesRaw,
-        totalsRaw,
-        participantsRaw,
-        locationsRaw,
-        tablesRaw,
-        heatRaw,
-        departamentosRaw,
-        mesasAmbitoRaw,
-        totalsAmbitoRaw,
-        heatAmbitoRaw,
-        continentesExteriorRaw,
-        heatExteriorRaw,
-        presidencialExteriorRaw,
-        mesasExteriorRaw,
-        orgRaw,
-        geoPeruRaw,
-        geoRaw
-      ] = await Promise.all([
-        getJson('procesoActivo', API_URLS.procesoActivo).catch(() => null),
-        getJson('elecciones', API_URLS.elecciones).catch(() => null),
-        getJson('resumenTotales', API_URLS.resumenTotales).catch(() => null),
-        getJson('resumenParticipantes', API_URLS.resumenParticipantes).catch(() => null),
-        getJson('presidencialPorUbicacion', API_URLS.presidencialPorUbicacion).catch(() => null),
-        getJson('mesasTotales', API_URLS.mesasTotales).catch(() => null),
-        getJson('mapaCalor', API_URLS.mapaCalor).catch(() => null),
-        getJson('departamentos', API_URLS.departamentos).catch(() => null),
-        getJson('mesasAmbito', API_URLS.mesasAmbito).catch(() => null),
-        getJson('resumenTotalesAmbito', API_URLS.resumenTotalesAmbito).catch(() => null),
-        getJson('mapaCalorAmbito', API_URLS.mapaCalorAmbito).catch(() => null),
-        getOnpeUrl(endpoints.continentesExterior).catch(() => null),
-        getOnpeUrl(endpoints.mapaCalorExterior).catch(() => null),
-        getOnpeUrl(endpoints.presidencialExterior).catch(() => null),
-        getOnpeUrl(endpoints.mesasExterior).catch(() => null),
-        getJson('presidencialPorOrganizacion', API_URLS.presidencialPorOrganizacion).catch(() => null),
-        getJson('geodataPeru', ASSET_URLS.geodataPeru).catch(() => null),
-        getJson('geodataContinental', ASSET_URLS.geodataContinental).catch(() => null)
+      [ronbSnapshot, ronbProjection, ronbExterior, ronbTimeline, geoPeruRaw, geoRaw] = await Promise.all([
+        getRonb('snapshot').catch(() => null),
+        getRonb('proyeccion').catch(() => null),
+        getRonb('exterior-paises').catch(() => null),
+        getRonb('timeline', 'limit=500').catch(() => null),
+        getJson('geodataPeru').catch(() => null),
+        getJson('geodataContinental').catch(() => null)
       ]);
+
+      if (ronbSnapshot) {
+        totalsRaw = ronbTotals(ronbSnapshot.national);
+        participantsRaw = { data: ronbParticipants(ronbSnapshot) };
+        departamentosRaw = { data: ronbDepartmentRefs(ronbSnapshot) };
+        heatAmbitoRaw = { data: ronbHeatRows(ronbSnapshot) };
+        totalsAmbitoRaw = { data: ronbTotalsByScope(ronbSnapshot) };
+        presidencialExteriorRaw = ronbExteriorParticipants(ronbSnapshot);
+      }
     } catch (e) {
-      console.warn('ONPE no disponible, usando datos de fallback', e);
+      ronbSnapshot = null;
     }
-  }
 
-  state.raw = { procesoRaw, eleccionesRaw, totalsRaw, participantsRaw, locationsRaw, tablesRaw, heatRaw, departamentosRaw, mesasAmbitoRaw, totalsAmbitoRaw, heatAmbitoRaw, continentesExteriorRaw, heatExteriorRaw, presidencialExteriorRaw, mesasExteriorRaw, orgRaw, geoPeruRaw, geoRaw, ronbSnapshot, ronbProjection, ronbExterior };
-  state.ronbProjection = ronbProjection;
-  state.ronbExterior = ronbExterior;
-
-  const hasRealData = Boolean(ronbSnapshot || (totalsRaw && participantsRaw));
-
-  // Usar datos reales o fallback cuando ONPE está bloqueado
-  const mainTotalsRaw = totalsRaw || totalsAmbitoRaw;
-  const mainMesasRaw = tablesRaw || mesasAmbitoRaw;
-  const totals = mainTotalsRaw ? normalizeTotals(mainTotalsRaw, mainMesasRaw) : fallback.totals;
-
-  const participants = ronbSnapshot ? ronbParticipants(ronbSnapshot) : hasRealData ? normalizeParticipants(orgRaw, participantsRaw) : fallback.participants;
-  const locations = ronbSnapshot ? ronbDepartmentRows(ronbSnapshot) : hasRealData ? buildDepartmentRows(departamentosRaw, heatAmbitoRaw) : fallback.locations;
-  const territoryDetailsRaw = ronbSnapshot ? ronbTerritoryRows(ronbSnapshot, ronbProjection || {}) : await loadTerritoryDetailRows(departamentosRaw, continentesExteriorRaw).catch(() => []);
-  const territoryDetails = territoryDetailsRaw.length ? territoryDetailsRaw : fallback.territories;
-
-  state.participants = participants;
-  state.locations = locations;
-
-  updateProcessInfo(procesoRaw, eleccionesRaw);
-  updateKpis(totals);
-  updateDuel(participants, mainTotalsRaw || totals);
-  updateParticipationView();
-  renderCandidates(participants);
-  renderProjectionChart(participants, mainTotalsRaw || totals);
-  try { renderPendingVote(territoryDetails); } catch (e) { console.warn('Pending vote failed', e); }
-  try { renderJeeImpact(territoryDetails); } catch (e) { console.warn('JEE impact failed', e); }
-  try { await renderWorldVote(continentesExteriorRaw, heatExteriorRaw, presidencialExteriorRaw); } catch (e) { console.warn('World vote failed', e); }
-  renderMap(locations, geoPeruRaw, departamentosRaw, heatAmbitoRaw);
-  renderLocations(locations);
-
-  if (!hasRealData) {
-    qs('apiStatus').textContent = 'ONPE bloqueado (Cloudflare). Usando datos de prueba.';
-    qs('apiDot').classList.add('error');
-  } else if (ronbSnapshot) {
-    qs('apiStatus').textContent = 'Datos reales vía proxy RonBStudio';
-    qs('apiDot').classList.remove('error');
-    qs('apiDot').classList.add('ok');
-    const lastUpdate = qs('lastUpdate');
-    if (lastUpdate) {
-      lastUpdate.dataset.base = `Última actualización: ${new Date(ronbSnapshot.ts || Date.now()).toLocaleTimeString('es-PE')}`;
-      updateRefreshCountdown();
+    if (!ronbSnapshot) {
+      try {
+        [
+          procesoRaw,
+          eleccionesRaw,
+          totalsRaw,
+          participantsRaw,
+          locationsRaw,
+          tablesRaw,
+          heatRaw,
+          departamentosRaw,
+          mesasAmbitoRaw,
+          totalsAmbitoRaw,
+          heatAmbitoRaw,
+          continentesExteriorRaw,
+          heatExteriorRaw,
+          presidencialExteriorRaw,
+          mesasExteriorRaw,
+          orgRaw,
+          geoPeruRaw,
+          geoRaw
+        ] = await Promise.all([
+          getJson('procesoActivo').catch(() => null),
+          getJson('elecciones').catch(() => null),
+          getJson('resumenTotales').catch(() => null),
+          getJson('resumenParticipantes').catch(() => null),
+          getJson('presidencialPorUbicacion').catch(() => null),
+          getJson('mesasTotales').catch(() => null),
+          getJson('mapaCalor').catch(() => null),
+          getJson('departamentos').catch(() => null),
+          getJson('mesasAmbito').catch(() => null),
+          getJson('resumenTotalesAmbito').catch(() => null),
+          getJson('mapaCalorAmbito').catch(() => null),
+          getOnpeUrl(exteriorEndpoints.continentesExterior).catch(() => null),
+          getOnpeUrl(exteriorEndpoints.mapaCalorExterior).catch(() => null),
+          getOnpeUrl(exteriorEndpoints.presidencialExterior).catch(() => null),
+          getOnpeUrl(exteriorEndpoints.mesasExterior).catch(() => null),
+          getJson('presidencialPorOrganizacion').catch(() => null),
+          getJson('geodataPeru').catch(() => null),
+          getJson('geodataContinental').catch(() => null)
+        ]);
+      } catch (e) {
+        console.warn('ONPE no disponible, usando datos de fallback', e);
+      }
     }
-  } else {
-    updateStatus(true);
-  }
 
-  state.loading = false;
-  qs('refreshBtn').disabled = false;
-  qs('refreshBtn').textContent = 'Refrescar resultados';
-  scheduleAutoRefresh();
+    state.raw = { procesoRaw, eleccionesRaw, totalsRaw, participantsRaw, locationsRaw, tablesRaw, heatRaw, departamentosRaw, mesasAmbitoRaw, totalsAmbitoRaw, heatAmbitoRaw, continentesExteriorRaw, heatExteriorRaw, presidencialExteriorRaw, mesasExteriorRaw, orgRaw, geoPeruRaw, geoRaw, ronbSnapshot, ronbProjection, ronbExterior };
+    state.ronbProjection = ronbProjection;
+    state.ronbExterior = ronbExterior;
+    state.ronbTimeline = ronbTimeline;
+
+    const hasRealData = Boolean(ronbSnapshot || (totalsRaw && participantsRaw));
+
+    // Usar datos reales o fallback cuando ONPE está bloqueado
+    const mainTotalsRaw = totalsRaw || totalsAmbitoRaw;
+    const mainMesasRaw = tablesRaw || mesasAmbitoRaw;
+    const totals = mainTotalsRaw ? normalizeTotals(mainTotalsRaw, mainMesasRaw) : fallback.totals;
+
+    const participants = ronbSnapshot ? ronbParticipants(ronbSnapshot) : hasRealData ? normalizeParticipants(orgRaw, participantsRaw) : fallback.participants;
+    const locations = ronbSnapshot ? ronbDepartmentRows(ronbSnapshot) : hasRealData ? buildDepartmentRows(departamentosRaw, heatAmbitoRaw) : fallback.locations;
+    const territoryDetailsRaw = ronbSnapshot ? ronbTerritoryRows(ronbSnapshot, ronbProjection || {}) : await loadTerritoryDetailRows(departamentosRaw, continentesExteriorRaw).catch(() => []);
+    const territoryDetails = territoryDetailsRaw.length ? territoryDetailsRaw : fallback.territories;
+
+    state.participants = participants;
+    state.locations = locations;
+
+    updateProcessInfo(procesoRaw, eleccionesRaw);
+    updateKpis(totals);
+    updateDuel(participants, mainTotalsRaw || totals);
+    updateParticipationView();
+    renderCandidates(participants);
+    renderProjectionChart(participants, mainTotalsRaw || totals);
+    try { renderFinalStretch(); } catch (e) { console.warn('Final stretch failed', e); }
+    try { renderPendingVote(territoryDetails); } catch (e) { console.warn('Pending vote failed', e); }
+    try { renderJeeImpact(territoryDetails); } catch (e) { console.warn('JEE impact failed', e); }
+    try { await renderWorldVote(continentesExteriorRaw, heatExteriorRaw, presidencialExteriorRaw); } catch (e) { console.warn('World vote failed', e); }
+    renderMap(locations, geoPeruRaw, departamentosRaw, heatAmbitoRaw);
+
+    if (!hasRealData) {
+      qs('apiStatus').textContent = 'ONPE bloqueado (Cloudflare). Usando datos de prueba.';
+      qs('apiDot').classList.add('error');
+    } else if (ronbSnapshot) {
+      qs('apiStatus').textContent = 'Datos reales vía proxy RonBStudio';
+      qs('apiDot').classList.remove('error');
+      qs('apiDot').classList.add('ok');
+      const lastUpdate = qs('lastUpdate');
+      if (lastUpdate) {
+        lastUpdate.dataset.base = `Última actualización: ${new Date(ronbSnapshot.ts || Date.now()).toLocaleTimeString('es-PE')}`;
+        updateRefreshCountdown();
+      }
+    } else {
+      updateStatus(true);
+    }
+  } catch (error) {
+    console.warn('Error inesperado al refrescar el dashboard', error);
+  } finally {
+    // Pase lo que pase, el botón y el auto-refresh quedan operativos.
+    state.loading = false;
+    if (refreshBtn) {
+      refreshBtn.disabled = false;
+      refreshBtn.classList.remove('is-loading');
+      refreshBtn.textContent = 'Refrescar resultados';
+    }
+    scheduleAutoRefresh();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1834,16 +1967,15 @@ document.addEventListener('DOMContentLoaded', () => {
     state.participationScope = state.participationScope === 'foreign' ? 'peru' : 'foreign';
     updateParticipationView();
   });
-  if (qs('regionSearch')) {
-    qs('regionSearch').addEventListener('input', (event) => {
-      const query = event.target.value.trim().toLowerCase();
-      const filtered = state.locations.filter(x => `${x.ubicacion} ${x.ganador}`.toLowerCase().includes(query));
-      renderLocations(filtered);
-      renderMap(filtered, state.raw.geoPeruRaw, state.raw.departamentosRaw, state.raw.heatAmbitoRaw);
-    });
-  }
   qs('continentFilter').addEventListener('change', () => renderWorldVoteRows(state.worldRows));
   qs('countryFilter').addEventListener('change', () => renderWorldVoteRows(state.worldRows));
+  document.querySelectorAll('.stretch-mode').forEach(button => {
+    button.addEventListener('click', () => {
+      state.stretchMode = button.dataset.mode || 'total';
+      document.querySelectorAll('.stretch-mode').forEach(b => b.classList.toggle('is-active', b === button));
+      renderFinalStretch();
+    });
+  });
   loadData();
 });
 

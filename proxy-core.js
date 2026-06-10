@@ -3,6 +3,13 @@ const { endpoints } = require('./onpe-map');
 const ALLOWED_HOSTS = new Set(['resultadosegundavuelta.onpe.gob.pe']);
 const RONB_BASE = 'https://api.ronbstudio.com';
 const RONB_RESOURCES = new Set(['snapshot', 'proyeccion', 'timeline', 'exterior-paises']);
+const UPSTREAM_TIMEOUT_MS = 20000;
+
+function upstreamTimeoutSignal() {
+  return typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
+    ? AbortSignal.timeout(UPSTREAM_TIMEOUT_MS)
+    : undefined;
+}
 
 function resolveTarget(query = {}) {
   const key = query.key;
@@ -64,6 +71,7 @@ async function fetchOnpe(query = {}) {
 
   const response = await fetch(target.toString(), {
     redirect: 'follow',
+    signal: upstreamTimeoutSignal(),
     headers: {
       Accept: 'application/json, text/plain, */*',
       'Accept-Language': 'es-PE,es;q=0.9,en;q=0.8',
@@ -136,6 +144,7 @@ async function fetchRonb(resource, query = {}) {
 
   const response = await fetch(target.toString(), {
     redirect: 'follow',
+    signal: upstreamTimeoutSignal(),
     headers: {
       Accept: 'application/json',
       'Accept-Language': 'es-PE,es;q=0.9,en;q=0.8',

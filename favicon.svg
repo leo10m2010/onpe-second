@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <circle cx="32" cy="32" r="30" fill="#102f59"/>
+  <path d="M32 4a28 28 0 0 0 0 56z" fill="#ff7426"/>
+  <path d="M32 4a28 28 0 0 1 0 56z" fill="#d42634"/>
+  <circle cx="32" cy="32" r="14" fill="#fbfcfe"/>
+  <text x="32" y="37" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="14" fill="#102f59">PE</text>
+</svg>

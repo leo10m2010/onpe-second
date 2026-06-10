@@ -12,7 +12,6 @@ app.get('/api/health', (req, res) => {
 app.get('/api/onpe', async (req, res) => {
   try {
     const result = await fetchOnpe(req.query);
-    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     if (result.target) res.setHeader('X-Proxy-Target', result.target);
@@ -35,7 +34,6 @@ app.get('/api/test', async (req, res) => {
 app.get('/api/debug', async (req, res) => {
   try {
     const result = await fetchOnpe({ url: req.query.url });
-    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     if (result.target) res.setHeader('X-Proxy-Target', result.target);
@@ -48,7 +46,6 @@ app.get('/api/debug', async (req, res) => {
 app.get('/api/ronb/:resource', async (req, res) => {
   try {
     const result = await fetchRonb(req.params.resource, req.query);
-    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     if (result.target) res.setHeader('X-Proxy-Target', result.target);

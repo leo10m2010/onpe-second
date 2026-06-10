@@ -5,6 +5,7 @@
     { "source": "/api/onpe", "destination": "/api/onpe.js" },
     { "source": "/api/health", "destination": "/api/health.js" },
     { "source": "/api/test", "destination": "/api/test.js" },
-    { "source": "/api/debug", "destination": "/api/onpe.js" }
+    { "source": "/api/debug", "destination": "/api/onpe.js" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
